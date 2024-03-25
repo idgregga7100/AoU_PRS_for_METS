@@ -1,0 +1,104 @@
+#Used Recommended "General Analysis" environment to run
+#4 CPU 15GB RAM, 200GB Disk
+import os
+import subprocess
+import numpy as np
+import pandas as pd
+from datetime import datetime
+from sklearn.preprocessing import StandardScaler #to scale height
+start = datetime.now()
+#ran in bkgd
+#checking current bucket contents and VM contents
+#!gsutil ls $WORKSPACE_BUCKET/data
+#!ls
+#!mkdir plink
+
+#retrieve plink2 files (pgen/pvar/psam) from bucket
+# get the bucket name
+my_bucket = os.getenv('WORKSPACE_BUCKET')
+
+#cp pgen/pvar/psam files from bucket to workspace 
+#takes ~4 min
+#!gsutil -m cp gs://fc-secure-09b7d164-67b2-4c94-8381-4b8202619ea8/data/plink/prscsx_acaf_threshold.chr*.p* plink/
+#!gsutil cp $WORKSPACE_BUCKET/data/AoU_height_bmi_demog_pca_n234585.txt .
+#make phenofile for each training pop (rm hold-out set from each pop)
+#for i in range(1,11):
+#    print(i)
+
+for i in range(1,11):
+    for ancestry in ["afr","amr","eur"]:
+        i=str(i)
+        data = pd.read_csv("AoU_height_bmi_demog_pca_n234585.txt",sep="\t")
+        #filter to ancestry desired
+        popdata = data[data['ancestry_pred_other']==ancestry]
+        #remove aou_test hold-out set
+        #read in holdout set
+        holdout = pd.read_csv("aou_holdout10fold_"+ancestry+"_id_group"+i+".txt",sep="\t",header=None)
+        #make a list to filter popdata df
+        holdoutlist = list(holdout[0])
+        popdata_noholdout = popdata[~popdata.research_id.isin(holdoutlist)]
+        #print(popdata_noholdout.shape)
+        #rename "research_id" "#IID" for plink2
+        popdata_noholdout = popdata_noholdout.rename(columns={'research_id': '#IID'})
+        #drop columns with spaces b/c plink won't work
+        popdata_noholdout = popdata_noholdout.drop(columns=['race', 'ethnicity','gender'])
+        #scale height data for GWAS (mean=0, sd=1)
+        #from: https://www.geeksforgeeks.org/how-to-scale-pandas-dataframe-columns/
+        #retrieve height, weight, bmi, age_ht, age_wt  to scale
+        height = popdata_noholdout[['height','weight','bmi','age_ht','age_wt']]
+        #scale
+        std_scaler = StandardScaler()
+        df_scaled = std_scaler.fit_transform(height.to_numpy())
+        #convert back to pandas df
+        df_scaled = pd.DataFrame(df_scaled)
+        #name columns
+        df_scaled.columns = ['scaled_ht','scaled_wt','scaled_bmi','scaled_age_ht','scaled_age_wt']
+        #add columns to original df
+        #need to reset index of popdata_noholdout to start at 0 before join
+        #from: https://stackoverflow.com/questions/33088010/pandas-column-bind-cbind-two-data-frames
+        pheno = popdata_noholdout.reset_index(drop=True).join(df_scaled)
+        #write to file, write missing data as NA
+        pheno.to_csv("Phenofile_AoU_training10fold_height_bmi_demog_pca_" + ancestry + "_group"+i+".txt",sep="\t",index=False,na_rep="NA")
+        
+#head Phenofile_AoU_training10fold_height_bmi_demog_pca_afr_group1.txt
+
+%%bash
+#plink2 GWAS for scaled_bmi with covariates: PCs1-16,sex_at_birth,scaled_age_wt
+mkdir gwas
+
+for k in {1..10}
+do
+    for pop in afr amr
+    do
+        for i in {1..22}
+        do
+            plink2 --pfile plink/prscsx_acaf_threshold.chr${i} \
+              --pheno 'iid-only' Phenofile_AoU_training10fold_height_bmi_demog_pca_${pop}_group${k}.txt \
+              --pheno-name scaled_bmi \
+              --glm 'omit-ref' \
+              --maf 0.001 \
+              --covar-col-nums 2-17,20,30 \
+              --out gwas/GWAS-bmi_AoU_training10fold_group${k}_${pop}_chr${i} 
+        done
+    done
+done
+
+for k in {1..10}
+do
+    for pop in eur
+    do
+        for i in {1..22}
+        do
+            plink2 --pfile plink/prscsx_acaf_threshold.chr${i} \
+              --pheno 'iid-only' Phenofile_AoU_training10fold_height_bmi_demog_pca_${pop}_group${k}.txt \
+              --pheno-name scaled_bmi \
+              --glm 'omit-ref' \
+              --maf 0.001 \
+              --covar-col-nums 2-6,20,30 \
+              --out gwas/GWAS-bmi_AoU_training10fold_group${k}_${pop}_chr${i} 
+        done
+    done
+done
+#how long did it take?
+stop = datetime.now()
+str(stop-start)

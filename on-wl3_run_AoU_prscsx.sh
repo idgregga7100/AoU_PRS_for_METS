@@ -2,6 +2,7 @@
 
 #I ran the GWAS on AoU workbench,
 #gzipped and downloaded the sumstats (each ~13MB)
+#they need to be GUNZIPPED
 
 #AoU training height sample sizes
 #afr=46784, amr=34717, eur=105791
@@ -29,7 +30,7 @@ do
 /home/wheelerlab3/anaconda2/bin/python /home/wheelerlab3/2023-09-08_PRSCSx/PRScsx/PRScsx.py \
 --ref_dir=/home/wheelerlab3/Data/PRS_LD_refs/ \
 --bim_prefix=/home/wheelerlab3/2023-09-08_PRSCSx/PRSCSx_testing/METS756_merged_pre-imp_rsid_chr1-22 \
---sst_file=${mydir}gwas/GWAS-${pheno}_AoU_training10fold_group${k}_${pop1}_scaled_${pheno}.sumstats.txt,${mydir}gwas/GWAS-${pheno}_AoU_training10fold_group${k}_${pop2}_scaled_${pheno}.sumstats.t>
+--sst_file=${mydir}crossval-gwas/GWAS-${pheno}_AoU_training10fold_group${k}_${pop1}_scaled_${pheno}.sumstats.txt,${mydir}crossval-gwas/GWAS-${pheno}_AoU_training10fold_group${k}_${pop2}_scaled_${pheno}.sumstats.txt,${mydir}crossval-gwas/GWAS-${pheno}_AoU_training10fold_group${k}_${pop3}_scaled_${pheno}.sumstats.txt \
 --n_gwas=$n1,$n2,$n3 \
 --pop=${pop1^^},${pop2^^},${pop3^^} \
 --phi=${phi} \

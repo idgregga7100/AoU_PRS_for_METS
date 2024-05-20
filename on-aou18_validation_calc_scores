@@ -1,0 +1,56 @@
+#Used Recommended "General Analysis" environment to run
+#4 CPU 15GB RAM, 120GB Disk
+#isa: increasing to 200disk bcuz running ht+bmi
+import os
+import subprocess
+import numpy as np
+import pandas as pd
+from datetime import datetime
+start = datetime.now()
+#ran in bkgd
+
+name_of_dir_in_bucket = 'prscsx_out_trainAoU-10fold_METS756_bim/'
+# get the bucket name
+my_bucket = os.getenv('WORKSPACE_BUCKET')
+# copy dir from the bucket to the current working space
+os.system(f"gsutil -m cp -r '{my_bucket}/data/{name_of_dir_in_bucket}' .")
+#heldout lists for each group
+os.system(f"gsutil -m cp -r '{my_bucket}/data/aou_holdout10fold*.txt' .")
+
+%%bash
+mkdir plink
+mkdir scores_10fold
+#calc prs in the heldout sample sets, bmi, 1e-2, 1e-4
+for k in {1..10}
+do
+for i in {1..22}
+do
+  #if needed: cp pgen/pvar/psam files from bucket to workspace (uncomment the line below)
+  gsutil -m cp gs://fc-secure-09b7d164-67b2-4c94-8381-4b8202619ea8/data/plink/prscsx_acaf_threshold.chr${i}.p* plink/
+  for POP in AFR AMR EUR
+  do
+    pop=echo "$POP" | tr '[:upper:]' '[:lower:]'
+    for phi in 1e-02 1e-04
+    do
+    #calc PRS for each chr-pop pair
+    plink2 --pfile plink/prscsx_acaf_threshold.chr${i} \
+    --keep aou_holdout10fold${pop}_id_group${k}.txt \
+    --score prscsx_out_trainAoU-10fold_METS756_bim/AoU_scaled_bmi_${POP}_pst_eff_a1_b0.5_phi${phi}_chr${i}.txt 2 4 6 variance-standardize list-variants \
+    --out scores_10fold/AoU_scaled_bmi_${POP}_pst_eff_a1_b0.5_phi${phi}_chr${i}_30k_held-out
+    done
+  done
+done
+done
+
+#add scores directory to bucket
+# This code saves your directory in a "data" folder in Google Bucket
+# Replace with THE NAME OF YOUR DIRECTORY
+name_of_dir_in_workspace = 'scores_10fold'
+# get the bucket name
+my_bucket = os.getenv('WORKSPACE_BUCKET')
+# copy dir file to the bucket
+os.system(f"gsutil -m cp -r '{name_of_dir_in_workspace}' {my_bucket}/data/")
+
+#how long did it take?
+stop = datetime.now()
+str(stop-start)

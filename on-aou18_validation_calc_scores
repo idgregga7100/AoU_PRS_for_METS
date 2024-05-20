@@ -36,7 +36,7 @@ do
     plink2 --pfile plink/prscsx_acaf_threshold.chr${i} \
     --keep aou_holdout10fold${pop}_id_group${k}.txt \
     --score prscsx_out_trainAoU-10fold_METS756_bim/AoU_scaled_bmi_${POP}_pst_eff_a1_b0.5_phi${phi}_chr${i}.txt 2 4 6 variance-standardize list-variants \
-    --out scores_10fold/AoU_scaled_bmi_${POP}_pst_eff_a1_b0.5_phi${phi}_chr${i}_30k_held-out
+    --out scores_10fold/AoU_scaled_bmi_${POP}_pst_eff_a1_b0.5_phi${phi}_chr${i}_group${k}_heldout
     done
   done
 done

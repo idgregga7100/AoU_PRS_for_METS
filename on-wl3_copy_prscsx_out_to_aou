@@ -1,0 +1,3 @@
+#run on wheelerlab3
+#for isa: bucket printed on aou to get correct string
+gsutil -m cp -r prscsx_out_trainAoU-10fold_METS756_bim/ gs://fc-secure-882f9c14-244e-47ba-99d2-98c323ad0394/data

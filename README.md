@@ -11,7 +11,8 @@
 * COPY PRSCSX OUT TO AOU AND MOVE
 
 ### validate on AoU
-* process prscsx out
+* use prscsx out to calc prs in aou (validate)
+* process scores output
 * validation command line script
 * DOWNLOAD VAL OUT AND MOVE TO WL3
 

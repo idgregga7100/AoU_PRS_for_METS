@@ -29,7 +29,7 @@ do
   gsutil -m cp gs://fc-secure-09b7d164-67b2-4c94-8381-4b8202619ea8/data/plink/prscsx_acaf_threshold.chr${i}.p* plink/
   for POP in AFR AMR EUR
   do
-    pop=echo "$POP" | tr '[:upper:]' '[:lower:]'
+    pop=${POP,,}
     for phi in 1e-02 1e-04
     do
     #calc PRS for each chr-pop pair

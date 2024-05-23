@@ -92,7 +92,7 @@ system("gsutil -m cp AoU_scaled_bmi_PRSCSx_phi1e-04_in_AoU_group"%&%k%&%"_held-o
 }
 
 #group 10 separately because group 10 n=20820
-for(k in 10:10){
+k=10
 #Read and combine PRS's (add up chr scores per population)
 scoredir="scores_10fold/"
 n=20820 #number of people in .sscore files
@@ -136,4 +136,4 @@ colnames(all_data)
 fwrite(all_data,"AoU_scaled_bmi_PRSCSx_phi1e-04_in_AoU_group"%&%k%&%"_held-out_w_pheno.txt",quote=F,row.names=F,sep='\t')
 #cp to bucket
 system("gsutil -m cp AoU_scaled_bmi_PRSCSx_phi1e-04_in_AoU_group"%&%k%&%"_held-out_w_pheno.txt ${WORKSPACE_BUCKET}/data/")
-}
+

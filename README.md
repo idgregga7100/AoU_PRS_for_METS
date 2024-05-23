@@ -6,15 +6,19 @@
 * concat sumstats
 * DOWNLOAD SUMSTATS AND MOVE TO WL3
 
-### PRS-CSx on WL3
-* run PRSCSx on sumstats 
+### PRS-CSx on WL3 for cross-val pop weights
+* run PRSCSx on 90% sumstats, 10 groups
 * COPY PRSCSX OUT TO AOU AND MOVE
 
-### validate on AoU
-* use prscsx out to calc prs in aou (validate)
+### validate on AoU for pop weights cross val
+* use prscsx out to calc prs in heldodut aou, 10 groups (validate)
 * process scores output
-* validation command line script
+* validation command line script for modeling pop-level betas
 * DOWNLOAD VAL OUT AND MOVE TO WL3
+
+### PRS-CSx on WL3 for snp weights
+* run PRS-CSx on all sumstats, no cross val groups
+* no need to bring back to aou to validate snp-level betas
 
 ### test in METS on WL3
 * testing process

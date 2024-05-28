@@ -21,4 +21,7 @@
 * no need to bring back to aou to validate snp-level betas
 
 ### test in METS on WL3
-* testing process
+* testing process: 24-29 from dr w's steps, may rewrite/consolidate some?
+* calc PRS in METS, USE snp weight PRS-CSx out (no held out/no cross val groups) 
+* post imputation or merged pre and post imputation? which to prioritize?
+* afterward use cross-val pop weights to adjust scores

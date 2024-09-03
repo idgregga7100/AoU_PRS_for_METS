@@ -14,10 +14,10 @@
 * use prscsx out to calc prs in heldodut aou, 10 groups (validate)
 * process scores output
 * validation command line script for modeling pop-level betas
-* DOWNLOAD VAL OUT AND MOVE TO WL3
+* DOWNLOAD VAL OUT AND MOVE TO WL3 now we have pop-level adjustments
 
 ### PRS-CSx on WL3 for snp weights
-* run PRS-CSx on all sumstats, no cross val groups
+* run PRS-CSx on all sumstats, no cross val groups (run_prscsx_all*.sh)
 * no need to bring back to aou to validate snp-level betas
 
 ### test in METS on WL3
